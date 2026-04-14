@@ -18,12 +18,16 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "notification_id", nullable = false, unique = true)
+    @Column(name = "notification_id", unique = true)
     private Integer notificationId;
 
     //out of 5.0
     @Column(name = "rating", nullable = false)
     private double rating;
+
+    @Lob
+    @Column(name = "title")
+    private String title;
 
     @Lob
     @Column(name = "comment")

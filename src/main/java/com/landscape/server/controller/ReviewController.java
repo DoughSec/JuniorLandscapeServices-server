@@ -22,8 +22,8 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReviewResponseDto create(@RequestBody ReviewRequestDto request) {
         return reviewService.create(
-                request.getNotificationId(),
                 request.getRating(),
+                request.getTitle(),
                 request.getComment(),
                 request.getFirstName(),
                 request.getLastName()

@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReviewRequestDto {
-    private Integer notificationId;
     private double rating;
+    private String title;
     private String comment;
     private String firstName;
     private String lastName;

@@ -9,6 +9,7 @@ public class ReviewResponseDto {
     private Integer id;
     private Integer notificationId;
     private double rating;
+    private String title;
     private String comment;
     private String firstName;
     private String lastName;
