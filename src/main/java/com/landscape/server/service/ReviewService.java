@@ -1,7 +1,9 @@
 package com.landscape.server.service;
 
 import com.landscape.server.exception.BadRequestException;
+import com.landscape.server.exception.ResourceNotFoundException;
 import com.landscape.server.model.Review;
+import com.landscape.server.model.ReviewStatus;
 import com.landscape.server.model.dto.review.ReviewResponseDto;
 import com.landscape.server.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
@@ -21,13 +23,14 @@ public class ReviewService {
 
     // create Review
     public ReviewResponseDto create(
-            double rating, String title, String comment, String firstName, String lastName
+            ReviewStatus status, double rating, String title, String comment, String firstName, String lastName
     ) {
         if (rating < 0 || rating > 5) {
             throw new BadRequestException("rating must be between 0 and 5");
         }
 
         Review review = new Review();
+        review.setStatus(status == null ? ReviewStatus.PENDING : status);
         review.setRating(rating);
         review.setTitle(title);
         review.setComment(comment);
@@ -39,6 +42,7 @@ public class ReviewService {
         ReviewResponseDto responseDto = new ReviewResponseDto();
         responseDto.setId(review.getId());
         responseDto.setNotificationId(review.getNotificationId());
+        responseDto.setStatus(review.getStatus());
         responseDto.setRating(rating);
         responseDto.setTitle(title);
         responseDto.setComment(comment);
@@ -52,16 +56,74 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDto> getAll() {
         List<Review> reviews = reviewRepository.findAll();
-        return reviews.stream().map(review -> {
-            ReviewResponseDto dto = new ReviewResponseDto();
-            dto.setId(review.getId());
-            dto.setNotificationId(review.getNotificationId());
-            dto.setTitle(review.getTitle());
-            dto.setRating(review.getRating());
-            dto.setComment(review.getComment());
-            dto.setFirstName(review.getFirstName());
-            dto.setLastName(review.getLastName());
-            return dto;
-        }).toList();
+        return reviews.stream().map(this::mapToResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getPending() {
+        return reviewRepository.findByStatus(ReviewStatus.PENDING).stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getApproved() {
+        return reviewRepository.findByStatus(ReviewStatus.APPROVED).stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getDenied() {
+        return reviewRepository.findByStatus(ReviewStatus.DENIED).stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public ReviewResponseDto approve(Integer reviewId) {
+        Review review = getEntityById(reviewId);
+        review.setStatus(ReviewStatus.APPROVED);
+        reviewRepository.save(review);
+        return mapToResponse(review);
+    }
+
+    public ReviewResponseDto deny(Integer reviewId) {
+        Review review = getEntityById(reviewId);
+        review.setStatus(ReviewStatus.DENIED);
+        reviewRepository.save(review);
+        return mapToResponse(review);
+    }
+
+    public List<ReviewResponseDto> approveAll() {
+        List<Review> pending = reviewRepository.findByStatus(ReviewStatus.PENDING);
+        pending.forEach(r -> r.setStatus(ReviewStatus.APPROVED));
+        reviewRepository.saveAll(pending);
+        return pending.stream().map(this::mapToResponse).toList();
+    }
+
+    public void delete(Integer reviewId) {
+        Review review = getEntityById(reviewId);
+        reviewRepository.delete(review);
+    }
+
+    private Review getEntityById(Integer reviewId) {
+        if (reviewId == null) {
+            throw new BadRequestException("reviewId is required");
+        }
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found: " + reviewId));
+    }
+
+    private ReviewResponseDto mapToResponse(Review review) {
+        ReviewResponseDto dto = new ReviewResponseDto();
+        dto.setId(review.getId());
+        dto.setNotificationId(review.getNotificationId());
+        dto.setStatus(review.getStatus());
+        dto.setTitle(review.getTitle());
+        dto.setRating(review.getRating());
+        dto.setComment(review.getComment());
+        dto.setFirstName(review.getFirstName());
+        dto.setLastName(review.getLastName());
+        return dto;
     }
 }

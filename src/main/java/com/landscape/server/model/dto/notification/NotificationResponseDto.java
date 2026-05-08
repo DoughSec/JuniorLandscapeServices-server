@@ -11,6 +11,9 @@ public class NotificationResponseDto {
     private String firstName;
     private String lastName;
     private String email;
+    private String phone;
+    private String message;
     private NotificationStatus status;
     private boolean reviewCreated;
+    private java.time.LocalDateTime createdAt;
 }

@@ -30,6 +30,13 @@ public class Notification {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "phone")
+    private String phone;
+
+    @Lob
+    @Column(name = "message")
+    private String message;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private NotificationStatus status;

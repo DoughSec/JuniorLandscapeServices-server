@@ -21,6 +21,10 @@ public class Review {
     @Column(name = "notification_id", unique = true)
     private Integer notificationId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ReviewStatus status = ReviewStatus.PENDING;
+
     //out of 5.0
     @Column(name = "rating", nullable = false)
     private double rating;

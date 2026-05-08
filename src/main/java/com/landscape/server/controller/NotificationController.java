@@ -25,7 +25,9 @@ public class NotificationController {
         return notificationService.create(
                 request.getFirstName(),
                 request.getLastName(),
-                request.getEmail()
+                request.getEmail(),
+                request.getPhone(),
+                request.getMessage()
         );
     }
 

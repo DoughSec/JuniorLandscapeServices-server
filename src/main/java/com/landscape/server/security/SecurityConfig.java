@@ -34,7 +34,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/nomadTrack/auth/**").permitAll()
+                        .requestMatchers("/juniorLandscape/auth/**").permitAll()
+                        .requestMatchers("/juniorLandscape/notifications/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

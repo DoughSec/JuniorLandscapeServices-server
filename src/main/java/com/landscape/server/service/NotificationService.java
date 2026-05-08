@@ -21,7 +21,7 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
-    public NotificationResponseDto create(String firstName, String lastName, String email) {
+    public NotificationResponseDto create(String firstName, String lastName, String email, String phone, String message) {
         if (isBlank(firstName)) {
             throw new BadRequestException("firstName is required");
         }
@@ -36,6 +36,8 @@ public class NotificationService {
         notification.setFirstName(firstName);
         notification.setLastName(lastName);
         notification.setEmail(email);
+        notification.setPhone(phone);
+        notification.setMessage(message);
         notification.setStatus(NotificationStatus.PENDING);
         notification.setReviewCreated(false);
 
@@ -102,8 +104,11 @@ public class NotificationService {
         dto.setFirstName(notification.getFirstName());
         dto.setLastName(notification.getLastName());
         dto.setEmail(notification.getEmail());
+        dto.setPhone(notification.getPhone());
+        dto.setMessage(notification.getMessage());
         dto.setStatus(notification.getStatus());
         dto.setReviewCreated(notification.isReviewCreated());
+        dto.setCreatedAt(notification.getCreatedAt());
         return dto;
     }
 
